@@ -1,7 +1,7 @@
 use crate::plan::Draft;
 use schema_types::{
     record_keys::{RecordKeyDefinition, RecordKeyKind, RecordKeys},
-    DeclarativeSchemaDefinition, DeclarativeSchemaType, FieldValueType,
+    DeclarativeSchemaDefinition, FieldValueType,
 };
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
