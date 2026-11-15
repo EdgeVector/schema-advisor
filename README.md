@@ -2,6 +2,21 @@
 
 Schema Advisor helps app developers name and type fields and plan keys for LastDB. It works offline with the built-in Schema Service vocabulary. Review findings are suggestions. LastDB validates the declaration the app adopts.
 
+## Install
+
+Install LastDB and Python 3 on Apple Silicon macOS or Linux x86-64. For the
+development listing, use:
+
+```sh
+lastdb app install schema-advisor --env dev --channel next --accept-install
+schema-advisor --version
+```
+
+For an app version listed in your default registry channel, `lastdb app install
+schema-advisor --accept-install` uses that channel.
+
+The registry verifies the app listing. The installer verifies the downloaded executable against the SHA-256 digest pinned in this source. Advice and planning work locally after installation.
+
 ## Review and plan
 
 ```sh
