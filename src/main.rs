@@ -1,5 +1,6 @@
 mod cloud;
 mod plan;
+mod recommend;
 
 use clap::{Parser, Subcommand};
 use cloud::{CloudAdvice, Environment};
@@ -45,6 +46,17 @@ enum Command {
         /// Name and fields for a query ordered within one hash. Repeat for multiple queries.
         #[arg(long, num_args = 3, value_names = ["NAME", "HASH_FIELD", "RANGE_FIELD"])]
         ordered: Vec<String>,
+    },
+    /// Recommend a key layout for the queries a new schema needs.
+    Recommend {
+        /// Path to a standalone schema draft, or - for standard input.
+        input: String,
+        /// Path to a JSON array of query needs, or - for standard input.
+        #[arg(long, value_name = "FILE")]
+        queries: String,
+        /// Choose a compatible query whose fields are stable and unique.
+        #[arg(long, value_name = "QUERY")]
+        primary: Option<String>,
     },
 }
 
@@ -151,6 +163,24 @@ fn main() -> Result<(), Box<dyn Error>> {
         Command::Plan { input, id, ordered } => {
             let proposal = plan::schema(&read_input(&input)?, &id, &ordered)?;
             println!("{}", serde_json::to_string_pretty(&proposal)?);
+            Ok(())
+        }
+        Command::Recommend {
+            input,
+            queries,
+            primary,
+        } => {
+            if input == "-" && queries == "-" {
+                return Err(
+                    "supply either the draft or the queries on standard input, not both".into(),
+                );
+            }
+            let recommendation = recommend::schema(
+                &read_input(&input)?,
+                &read_input(&queries)?,
+                primary.as_deref(),
+            )?;
+            println!("{}", serde_json::to_string_pretty(&recommendation)?);
             Ok(())
         }
     }

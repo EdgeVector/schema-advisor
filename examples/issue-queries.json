@@ -1,0 +1,21 @@
+[
+  {
+    "name": "by_issue",
+    "kind": "lookup",
+    "hash": "issue_id",
+    "identity": true
+  },
+  {
+    "name": "by_project",
+    "kind": "ordered",
+    "hash": "project_id",
+    "range": "issue_created_at"
+  },
+  {
+    "name": "by_project_issue",
+    "kind": "lookup",
+    "hash": "project_id",
+    "range": "issue_id",
+    "identity": true
+  }
+]
