@@ -27,7 +27,7 @@ jobs:
       - run: cargo fmt --all -- --check
       - run: cargo clippy --locked -- -D warnings
       - run: cargo build --locked --release --target "$ADVISOR_TARGET"
-      - name: Review and plan an app schema
+      - name: Review, plan, and recommend an app schema
         shell: bash
         run: |
           set -euo pipefail
@@ -36,6 +36,10 @@ jobs:
           "$advisor" plan examples/issue.json --id issue_id --ordered by_project project_id issue_created_at |
             jq -e '.declaration.record_keys.alternates.by_project.range_type == "DateTime" and
               .app_supplies_on_write.alternates.by_project.hash_from == "project_id"' >/dev/null
+          "$advisor" recommend examples/issue.json --queries examples/issue-queries.json |
+            jq -e '.recommended.primary_query == "by_issue" and
+              .alternatives[0].primary_query == "by_project_issue" and
+              .declaration.record_keys.alternates.by_project.range_type == "DateTime"' >/dev/null
           mkdir -p "$RUNNER_TEMP/advisor"
           cp "$advisor" "$RUNNER_TEMP/advisor/schema-advisor-$ADVISOR_TARGET"
           ( cd "$RUNNER_TEMP/advisor" && shasum -a 256 "schema-advisor-$ADVISOR_TARGET" > "schema-advisor-$ADVISOR_TARGET.sha256" )
