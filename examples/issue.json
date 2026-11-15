@@ -1,0 +1,20 @@
+{
+  "name": "Issue",
+  "descriptive_name": "Issue",
+  "purpose_statement": "An issue in one project with a stable identity and a creation time.",
+  "fields": ["issue_id", "project_id", "issue_created_at", "issue_title", "user_id"],
+  "field_types": {
+    "issue_id": "String",
+    "project_id": "String",
+    "issue_created_at": "DateTime",
+    "issue_title": "String",
+    "user_id": "String"
+  },
+  "field_descriptions": {
+    "issue_id": "the stable opaque identifier of an issue",
+    "project_id": "the stable opaque identifier of the project that owns the issue",
+    "issue_created_at": "the timestamp when the issue was created",
+    "issue_title": "the title of the issue",
+    "user_id": "a stable opaque identifier for a user"
+  }
+}
