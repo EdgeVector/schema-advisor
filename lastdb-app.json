@@ -1,0 +1,27 @@
+{
+  "app_id": "schema-advisor",
+  "version": "0.1.0",
+  "audience": "public",
+  "metadata": {
+    "display_name": "Schema Advisor",
+    "description": "Review and plan LastDB app schemas offline.",
+    "homepage_url": "https://github.com/EdgeVector/schema-advisor"
+  },
+  "schemas": [],
+  "run": {
+    "runtime": "command",
+    "entrypoint": "dist/schema-advisor"
+  },
+  "install": {
+    "prepare": [
+      {"argv": ["python3", "scripts/install.py"], "timeout_s": 120}
+    ],
+    "links": [
+      {"source": "dist/schema-advisor", "command": "schema-advisor"}
+    ],
+    "probe": [
+      {"argv": ["dist/schema-advisor", "--version"], "timeout_s": 10},
+      {"argv": ["dist/schema-advisor", "plan", "examples/issue.json", "--id", "issue_id", "--ordered", "by_project", "project_id", "issue_created_at"], "timeout_s": 10}
+    ]
+  }
+}

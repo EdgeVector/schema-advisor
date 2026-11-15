@@ -1,0 +1,8 @@
+{
+  "version": "0.1.0",
+  "source_revision": "d3bdeb259aac348bcd337f7bd5b8700f9aca4640",
+  "sha256": {
+    "aarch64-apple-darwin": "c5728cc138f4792a170be4d8d3cbf56b0e12e0cbdcbd783b0b6d40c34a708318",
+    "x86_64-unknown-linux-gnu": "b07ba1163effedb23decbfccfe61a3836203268fe7867b44264643be5cfe32ff"
+  }
+}

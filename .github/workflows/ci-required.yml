@@ -39,6 +39,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/advisor"
           cp "$advisor" "$RUNNER_TEMP/advisor/schema-advisor-$ADVISOR_TARGET"
           ( cd "$RUNNER_TEMP/advisor" && shasum -a 256 "schema-advisor-$ADVISOR_TARGET" > "schema-advisor-$ADVISOR_TARGET.sha256" )
+      - name: Install the manifest-pinned release
+        run: |
+          set -euo pipefail
+          python3 scripts/install.py
+          dist/schema-advisor --version
+          dist/schema-advisor review lastdb-app.json --json | jq -e '. == []' >/dev/null
       - uses: actions/upload-artifact@v7
         id: upload
         with:
