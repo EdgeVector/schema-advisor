@@ -1,0 +1,67 @@
+name: Schema Advisor CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            target: aarch64-apple-darwin
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      ADVISOR_TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --locked -- -D warnings
+      - run: cargo build --locked --release --target "$ADVISOR_TARGET"
+      - name: Review and plan an app schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          advisor="target/$ADVISOR_TARGET/release/schema-advisor"
+          "$advisor" review examples/issue.json --json | jq -e '.[0].findings | length > 0' >/dev/null
+          "$advisor" plan examples/issue.json --id issue_id --ordered by_project project_id issue_created_at |
+            jq -e '.declaration.record_keys.alternates.by_project.range_type == "DateTime" and
+              .app_supplies_on_write.alternates.by_project.hash_from == "project_id"' >/dev/null
+          mkdir -p "$RUNNER_TEMP/advisor"
+          cp "$advisor" "$RUNNER_TEMP/advisor/schema-advisor-$ADVISOR_TARGET"
+          ( cd "$RUNNER_TEMP/advisor" && shasum -a 256 "schema-advisor-$ADVISOR_TARGET" > "schema-advisor-$ADVISOR_TARGET.sha256" )
+      - uses: actions/upload-artifact@v7
+        id: upload
+        with:
+          name: schema-advisor-${{ matrix.target }}
+          path: ${{ runner.temp }}/advisor/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Record the release artifact
+        shell: bash
+        env:
+          ADVISOR_ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          ADVISOR_ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          expiry=$(python3 -c 'from datetime import datetime, timedelta, timezone; print((datetime.now(timezone.utc) + timedelta(days=14)).date())')
+          printf 'Source %s\n\n[Download %s](%s)\n\nArtifact SHA-256 %s\n\nExpires %s UTC.\n' \
+            "$GITHUB_SHA" "$ADVISOR_TARGET" "$ADVISOR_ARTIFACT_URL" "$ADVISOR_ARTIFACT_DIGEST" "$expiry" >> "$GITHUB_STEP_SUMMARY"
+  ci-required:
+    needs: [build]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - env:
+          ADVISOR_BUILD_RESULT: ${{ needs.build.result }}
+        run: '[ "$ADVISOR_BUILD_RESULT" = "success" ]'
