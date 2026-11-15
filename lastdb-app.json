@@ -1,10 +1,10 @@
 {
   "app_id": "schema-advisor",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "audience": "public",
   "metadata": {
     "display_name": "Schema Advisor",
-    "description": "Review and plan LastDB app schemas offline.",
+    "description": "Review LastDB app schemas and recommend keys for the queries your app needs.",
     "homepage_url": "https://github.com/EdgeVector/schema-advisor"
   },
   "schemas": [],
@@ -21,7 +21,7 @@
     ],
     "probe": [
       {"argv": ["dist/schema-advisor", "--version"], "timeout_s": 10},
-      {"argv": ["dist/schema-advisor", "plan", "examples/issue.json", "--id", "issue_id", "--ordered", "by_project", "project_id", "issue_created_at"], "timeout_s": 10}
+      {"argv": ["dist/schema-advisor", "recommend", "examples/issue.json", "--queries", "examples/issue-queries.json"], "timeout_s": 10}
     ]
   }
 }
