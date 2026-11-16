@@ -68,3 +68,9 @@ all run locally.
 ## Source
 
 The CLI shares the field advice engine and key validators from LastDB. GitHub Actions builds the CLI and runs the example review, plan and recommendation on Apple Silicon and Linux x86-64.
+
+Each CI build also scores the local executable against synthetic cases for field
+matching, draft size and limits, and key planning. The run summary shows the
+score and names any mismatches. Download `advice-stress.json` in the platform
+artifact for the case details. To rerun the same cases with an installed build,
+use `python3 scripts/advice_stress.py --advisor /path/to/schema-advisor`.
