@@ -43,8 +43,10 @@ a record. Schema Advisor compares the eligible primary keys and shows the named
 alternate keys each choice needs. The output includes the recommended declaration
 and the values to supply on writes. In the Issue example, the global issue ID makes
 a shorter primary key than the project-and-issue pair. The timeline remains an
-ordered alternate key. Pass `--primary QUERY` to emit the declaration for
-a different eligible primary key.
+ordered alternate key. Starting in 0.2.1, the all-project-issues lookup shares
+that key. Use the project ID alone for the full list, or add date bounds for
+the timeline. The `query_keys` mapping shows which key each query should use.
+Pass `--primary QUERY` to emit the declaration for a different eligible primary key.
 
 ## Consult Schema Service
 

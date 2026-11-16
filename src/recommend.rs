@@ -122,41 +122,77 @@ impl<'a> Query<'a> {
 struct Layout<'a, 'q> {
     primary: &'q Query<'a>,
     alternates: BTreeMap<Coordinates<'a>, &'q Query<'a>>,
+    query_keys: BTreeMap<&'a str, &'a str>,
 }
 
 impl<'a, 'q> Layout<'a, 'q> {
     fn for_queries(primary: &'q Query<'a>, queries: &'q [Query<'a>]) -> Self {
+        // Required range keys cover their entire hash group. Prefer the primary,
+        // then an ordered query, when more than one range key can serve the group.
+        let mut ranges_by_hash = BTreeMap::new();
+        for query in std::iter::once(primary)
+            .chain(queries.iter().filter(|query| query.ordered))
+            .chain(queries)
+        {
+            if query.coordinates.range.is_some() {
+                ranges_by_hash
+                    .entry(query.coordinates.hash)
+                    .or_insert(query.coordinates);
+            }
+        }
+        let identities: BTreeSet<_> = queries
+            .iter()
+            .filter(|query| query.identity)
+            .map(|query| query.coordinates)
+            .collect();
+        let key_coordinates = |query: &Query<'a>| {
+            let coordinates = query.coordinates;
+            if coordinates.range.is_none()
+                && coordinates != primary.coordinates
+                && !identities.contains(&coordinates)
+            {
+                ranges_by_hash
+                    .get(coordinates.hash)
+                    .copied()
+                    .unwrap_or(coordinates)
+            } else {
+                coordinates
+            }
+        };
+
         let mut alternates = BTreeMap::new();
         for query in queries {
-            if query.coordinates != primary.coordinates {
+            if query.coordinates != primary.coordinates
+                && query.coordinates == key_coordinates(query)
+            {
                 // Different queries with the same coordinates share one key.
                 alternates.entry(query.coordinates).or_insert(query);
             }
         }
-        Self {
-            primary,
-            alternates,
-        }
-    }
-
-    fn summary(&self, queries: &[Query<'a>]) -> Value {
-        let query_keys: BTreeMap<_, _> = queries
+        let query_keys = queries
             .iter()
             .map(|query| {
-                let key = self
-                    .alternates
-                    .get(&query.coordinates)
+                let key = alternates
+                    .get(&key_coordinates(query))
                     .map_or("primary", |entry| entry.name);
                 (query.name, key)
             })
             .collect();
+        Self {
+            primary,
+            alternates,
+            query_keys,
+        }
+    }
+
+    fn summary(&self) -> Value {
         json!({
             "primary_query": self.primary.name,
             "primary_key": self.primary.key,
             "primary_fields": self.primary.coordinates.mapping(),
             "reason": self.primary.primary_reason(),
             "alternate_key_count": self.alternates.len(),
-            "query_keys": query_keys,
+            "query_keys": self.query_keys,
         })
     }
 
@@ -248,11 +284,11 @@ pub(crate) fn schema(draft: &Value, input: &Value, primary: Option<&str>) -> Res
         .iter()
         .skip(1)
         .filter(|candidate| primary_addresses.insert(candidate.coordinates))
-        .map(|candidate| Layout::for_queries(candidate, &queries).summary(&queries))
+        .map(|candidate| Layout::for_queries(candidate, &queries).summary())
         .collect::<Vec<_>>();
 
     Ok(json!({
-        "recommended": selected.summary(&queries),
+        "recommended": selected.summary(),
         "alternatives": layouts,
         "declaration": proposal["declaration"],
         "app_supplies_on_write": proposal["app_supplies_on_write"],
