@@ -1,6 +1,6 @@
 {
   "app_id": "schema-advisor",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "audience": "public",
   "metadata": {
     "display_name": "Schema Advisor",
