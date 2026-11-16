@@ -49,14 +49,25 @@ jobs:
           python3 scripts/install.py
           dist/schema-advisor --version
           dist/schema-advisor review lastdb-app.json --json | jq -e '. == []' >/dev/null
+      - name: Score offline schema advice
+        id: advice_stress
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/advice_stress.py \
+            --advisor "target/$ADVISOR_TARGET/release/schema-advisor" \
+            --report "$RUNNER_TEMP/advisor/advice-stress.json" |
+            tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         id: upload
+        if: ${{ !cancelled() && (success() || steps.advice_stress.outcome == 'failure') }}
         with:
           name: schema-advisor-${{ matrix.target }}
           path: ${{ runner.temp }}/advisor/
           if-no-files-found: error
           retention-days: 14
       - name: Record the release artifact
+        if: ${{ !cancelled() && steps.upload.outcome == 'success' }}
         shell: bash
         env:
           ADVISOR_ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
