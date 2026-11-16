@@ -371,7 +371,7 @@ checksum = "6518fc26bced4d53678a22d6e423e9d8716377def84545fe328236e3af070e7f"
 
 [[package]]
 name = "schema-advisor"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "clap",
  "schema_service_core",
@@ -383,7 +383,7 @@ dependencies = [
 [[package]]
 name = "schema_service_core"
 version = "0.1.0"
-source = "git+https://github.com/EdgeVector/lastdb.git?rev=ab1f50a3572c87b7bde6ef4050ee5eafda1bf96f#ab1f50a3572c87b7bde6ef4050ee5eafda1bf96f"
+source = "git+https://github.com/EdgeVector/lastdb.git?rev=d948f4eb34f7f4d017cc99d49b1fbb207caf52d9#d948f4eb34f7f4d017cc99d49b1fbb207caf52d9"
 dependencies = [
  "schema_types",
  "serde",
@@ -393,7 +393,7 @@ dependencies = [
 [[package]]
 name = "schema_types"
 version = "0.1.0"
-source = "git+https://github.com/EdgeVector/lastdb.git?rev=ab1f50a3572c87b7bde6ef4050ee5eafda1bf96f#ab1f50a3572c87b7bde6ef4050ee5eafda1bf96f"
+source = "git+https://github.com/EdgeVector/lastdb.git?rev=d948f4eb34f7f4d017cc99d49b1fbb207caf52d9#d948f4eb34f7f4d017cc99d49b1fbb207caf52d9"
 dependencies = [
  "chrono",
  "json-canon",
