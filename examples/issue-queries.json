@@ -6,6 +6,11 @@
     "identity": true
   },
   {
+    "name": "all_project_issues",
+    "kind": "lookup",
+    "hash": "project_id"
+  },
+  {
     "name": "by_project",
     "kind": "ordered",
     "hash": "project_id",
