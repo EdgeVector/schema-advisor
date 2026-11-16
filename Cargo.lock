@@ -383,7 +383,7 @@ dependencies = [
 [[package]]
 name = "schema_service_core"
 version = "0.1.0"
-source = "git+https://github.com/EdgeVector/lastdb.git?rev=d948f4eb34f7f4d017cc99d49b1fbb207caf52d9#d948f4eb34f7f4d017cc99d49b1fbb207caf52d9"
+source = "git+https://github.com/EdgeVector/lastdb.git?rev=e0c8a32402dfaad05fd9452056b01dbdf7045dc7#e0c8a32402dfaad05fd9452056b01dbdf7045dc7"
 dependencies = [
  "schema_types",
  "serde",
@@ -393,7 +393,7 @@ dependencies = [
 [[package]]
 name = "schema_types"
 version = "0.1.0"
-source = "git+https://github.com/EdgeVector/lastdb.git?rev=d948f4eb34f7f4d017cc99d49b1fbb207caf52d9#d948f4eb34f7f4d017cc99d49b1fbb207caf52d9"
+source = "git+https://github.com/EdgeVector/lastdb.git?rev=e0c8a32402dfaad05fd9452056b01dbdf7045dc7#e0c8a32402dfaad05fd9452056b01dbdf7045dc7"
 dependencies = [
  "chrono",
  "json-canon",

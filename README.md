@@ -25,6 +25,10 @@ schema-advisor review examples/issue.json --json
 schema-advisor plan examples/issue.json --id issue_id --ordered by_project project_id issue_created_at
 ```
 
+Review recognizes common field aliases and casing variants. Include what a field
+identifies or the units it uses so the advisor can check its description before
+suggesting a canonical field.
+
 The plan emits a `declaration` to put in the app manifest and `app_supplies_on_write` to map app fields to LastDB key values. In the example, LastDB stores one issue at its ID. The app supplies the project ID and creation time as the named alternate key when it writes the issue. A project lookup returns the same records in creation-time order.
 
 Each ordered query needs a known hash. A native timestamp range can hold several records at one time. Use an explicit ordering convention if the app needs a particular order within a tie.
